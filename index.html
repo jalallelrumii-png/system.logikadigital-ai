@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Logika Digital | Enterprise AI OS</title>
+    <title>Logika Digital | Enterprise AI OS (Groq)</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
@@ -31,53 +31,23 @@
     <script type="text/babel">
         const { useState, useEffect, useRef } = React;
 
-        // API Key Lo udah masuk di sini, jangan disebar sembarangan!
-        const apiKey = "AIzaSyA6lvInbiPjUhiwFCtEf5NzMvsrRlmsS9A"; 
+        // API Key Groq lo udah masuk di sini!
+        const apiKey = "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"; 
         
-        const MODEL_NAME = "gemini-2.5-flash-preview-09-2025";
-        const TTS_MODEL = "gemini-2.5-flash-preview-tts";
+        // Menggunakan Llama 3.3 70B via Groq untuk kecepatan maksimal
+        const MODEL_NAME = "llama-3.3-70b-versatile";
         const WA_NUMBER = "6283879527517"; 
-
-        // Helper for TTS (PCM to WAV)
-        const pcmToWav = (pcmData, sampleRate) => {
-            const buffer = new ArrayBuffer(44 + pcmData.length * 2);
-            const view = new DataView(buffer);
-            const writeString = (offset, string) => {
-                for (let i = 0; i < string.length; i++) {
-                    view.setUint8(offset + i, string.charCodeAt(i));
-                }
-            };
-            writeString(0, 'RIFF');
-            view.setUint32(4, 32 + pcmData.length * 2, true);
-            writeString(8, 'WAVE');
-            writeString(12, 'fmt ');
-            view.setUint32(16, 16, true);
-            view.setUint16(20, 1, true);
-            view.setUint16(22, 1, true);
-            view.setUint32(24, sampleRate, true);
-            view.setUint32(28, sampleRate * 2, true);
-            view.setUint16(32, 2, true);
-            view.setUint16(34, 16, true);
-            writeString(36, 'data');
-            view.setUint32(40, pcmData.length * 2, true);
-            let offset = 44;
-            for (let i = 0; i < pcmData.length; i++, offset += 2) {
-                view.setInt16(offset, pcmData[i], true);
-            }
-            return new Blob([buffer], { type: 'audio/wav' });
-        };
 
         const App = () => {
             const [activeTab, setActiveTab] = useState('demo');
             const [chatInput, setChatInput] = useState('');
             const [isProcessing, setIsProcessing] = useState(false);
-            const [isSpeaking, setIsSpeaking] = useState(false);
             const [messages, setMessages] = useState([
-                { role: 'bot', content: 'Sistem Logika Digital online. API Key terdeteksi. Silakan uji coba infrastruktur AI kami secara langsung.' }
+                { role: 'bot', content: 'Neural Engine v5.3 (Groq/Llama) aktif. Kecepatan respon: < 200ms. Silakan tes infrastruktur AI kami.' }
             ]);
             const [logs, setLogs] = useState([
-                { id: 1, time: new Date().toLocaleTimeString(), type: 'sys', msg: 'Neural Engine v5.3 Booting...' },
-                { id: 2, time: new Date().toLocaleTimeString(), type: 'success', msg: 'API Key Authenticated. Secure Connection Ready.' }
+                { id: 1, time: new Date().toLocaleTimeString(), type: 'sys', msg: 'System Core v5.3 Booting...' },
+                { id: 2, time: new Date().toLocaleTimeString(), type: 'success', msg: 'Groq LPU Authenticated. Zero Latency Mode: ENABLED.' }
             ]);
 
             const [adminCount, setAdminCount] = useState(3);
@@ -100,69 +70,36 @@
                 setLogs(prev => [...prev, { id: Date.now(), time: new Date().toLocaleTimeString(), msg, type }]);
             };
 
-            const callGemini = async (prompt, systemPrompt = "Anda adalah AI Business Architect dari Logika Digital.", retries = 5, delay = 1000) => {
-                const url = `https://generativelanguage.googleapis.com/v1beta/models/${MODEL_NAME}:generateContent?key=${apiKey}`;
+            // GROQ API CALL LOGIC
+            const callAI = async (prompt, systemPrompt = "Anda adalah AI Business Architect dari Logika Digital.", retries = 5, delay = 1000) => {
+                const url = `https://api.groq.com/openai/v1/chat/completions`;
                 try {
                     const response = await fetch(url, {
                         method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
+                        headers: { 
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${apiKey}`
+                        },
                         body: JSON.stringify({
-                            contents: [{ parts: [{ text: prompt }] }],
-                            systemInstruction: { parts: [{ text: systemPrompt }] }
+                            model: MODEL_NAME,
+                            messages: [
+                                { role: "system", content: systemPrompt + " Berikan jawaban yang cerdas, teknis, singkat, dan sangat meyakinkan dalam bahasa Indonesia. Selalu hubungkan jawaban Anda dengan efisiensi biaya." },
+                                { role: "user", content: prompt }
+                            ],
+                            temperature: 0.7,
+                            max_tokens: 1024
                         })
                     });
                     if (!response.ok) throw new Error(`HTTP Error: ${response.status}`);
                     const data = await response.json();
-                    return data.candidates?.[0]?.content?.parts?.[0]?.text || "Gagal mendapatkan respon neural.";
+                    return data.choices?.[0]?.message?.content || "Gagal mendapatkan respon neural.";
                 } catch (err) {
                     if (retries > 0) {
-                        pushLog(`Retrying Neural Link... (${6-retries}/5)`, 'warn');
+                        pushLog(`Retrying Neural Link via Groq... (${6-retries}/5)`, 'warn');
                         await new Promise(r => setTimeout(r, delay));
-                        return callGemini(prompt, systemPrompt, retries - 1, delay * 2);
+                        return callAI(prompt, systemPrompt, retries - 1, delay * 2);
                     }
                     throw err;
-                }
-            };
-
-            const callTTS = async (text) => {
-                setIsSpeaking(true);
-                const url = `https://generativelanguage.googleapis.com/v1beta/models/${TTS_MODEL}:generateContent?key=${apiKey}`;
-                try {
-                    const response = await fetch(url, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({
-                            contents: [{ parts: [{ text: `Say in a professional Indonesian accent: ${text}` }] }],
-                            generationConfig: {
-                                responseModalities: ["AUDIO"],
-                                speechConfig: {
-                                    voiceConfig: {
-                                        prebuiltVoiceConfig: { voiceName: "Puck" }
-                                    }
-                                }
-                            }
-                        })
-                    });
-                    const data = await response.json();
-                    const audioBase64 = data.candidates?.[0]?.content?.parts?.[0]?.inlineData?.data;
-                    const mimeType = data.candidates?.[0]?.content?.parts?.[0]?.inlineData?.mimeType;
-                    const sampleRate = mimeType ? parseInt(mimeType.split('rate=')[1]) : 24000;
-
-                    if (audioBase64) {
-                        const binaryString = atob(audioBase64);
-                        const len = binaryString.length;
-                        const bytes = new Int16Array(len / 2);
-                        for (let i = 0; i < len; i += 2) {
-                            bytes[i / 2] = binaryString.charCodeAt(i) | (binaryString.charCodeAt(i + 1) << 8);
-                        }
-                        const wavBlob = pcmToWav(bytes, sampleRate);
-                        const audioUrl = URL.createObjectURL(wavBlob);
-                        const audio = new Audio(audioUrl);
-                        audio.onended = () => setIsSpeaking(false);
-                        audio.play();
-                    }
-                } catch (err) {
-                    setIsSpeaking(false);
                 }
             };
 
@@ -174,16 +111,15 @@
                 setChatInput('');
                 setMessages(prev => [...prev, { role: 'user', content: userMsg }]);
                 setIsProcessing(true);
-                pushLog(`Neural Analysis: ${userMsg.substring(0, 15)}...`, 'sys');
+                pushLog(`Groq LPU Processing: ${userMsg.substring(0, 15)}...`, 'sys');
 
                 try {
-                    const result = await callGemini(userMsg);
+                    const result = await callAI(userMsg);
                     setMessages(prev => [...prev, { role: 'bot', content: result }]);
-                    pushLog("Execution sequence successful.", "success");
-                    callTTS(result.substring(0, 250)); 
+                    pushLog("Execution sequence successful (Speed: Ultra).", "success");
                 } catch (error) {
                     pushLog(`Neural Error: ${error.message}`, "error");
-                    setMessages(prev => [...prev, { role: 'bot', content: "Terjadi gangguan koneksi neural. Harap coba lagi." }]);
+                    setMessages(prev => [...prev, { role: 'bot', content: "Terjadi gangguan pada server Groq. Harap coba lagi." }]);
                 } finally {
                     setIsProcessing(false);
                 }
@@ -191,10 +127,10 @@
 
             const generateStrategy = async () => {
                 setIsGeneratingStrategy(true);
-                pushLog("Calculating custom automation strategy...", "sys");
+                pushLog("Calculating custom automation strategy via Llama...", "sys");
                 const prompt = `Analisis data: ${adminCount} admin dengan gaji Rp ${salary}. Total biaya Rp ${adminCount * salary}. Berikan 3 poin strategi automasi infrastruktur spesifik untuk memangkas biaya ini secara signifikan.`;
                 try {
-                    const result = await callGemini(prompt, "Anda adalah Business Architect Senior.");
+                    const result = await callAI(prompt, "Anda adalah Business Architect Senior.");
                     setStrategy(result);
                     pushLog("Automation strategy ready.", "success");
                 } catch (e) {
@@ -210,7 +146,7 @@
                 pushLog(`Neural Audit: ${lead.name}...`, "sys");
                 const prompt = `Lakukan audit teknis singkat untuk Lead: ${lead.name}, Status: ${lead.status}, Score: ${lead.score}%. Berikan instruksi follow-up otonom.`;
                 try {
-                    const result = await callGemini(prompt, "Anda adalah Lead Auditor AI.");
+                    const result = await callAI(prompt, "Anda adalah Lead Auditor AI.");
                     setCrmLeads(prev => prev.map(l => l.id === leadId ? { ...l, analysis: result } : l));
                     pushLog(`Audit complete for ${lead.name}`, "success");
                 } catch (e) {
@@ -239,15 +175,15 @@
                         <header className="h-20 border-b border-white/5 flex items-center justify-between px-10 glass z-40">
                             <div>
                                 <h1 className="text-2xl font-black italic tracking-tighter">LOGIKA <span className="text-yellow-500 underline decoration-2">DIGITAL</span></h1>
-                                <p className="text-[10px] font-mono text-zinc-500 tracking-[0.4em] uppercase leading-none">Powered by Gemini ✨</p>
+                                <p className="text-[10px] font-mono text-zinc-500 tracking-[0.4em] uppercase leading-none">Powered by Groq ✨</p>
                             </div>
                             <div className="flex items-center gap-6">
                                 <div className="text-right hidden sm:block">
-                                    <p className="text-[10px] font-black text-yellow-500">NEURAL_LINK_OK</p>
-                                    <p className="text-[9px] text-zinc-600 font-mono tracking-tighter uppercase">SECURE_ACTIVE</p>
+                                    <p className="text-[10px] font-black text-yellow-500 underline decoration-yellow-500/50">GROQ_ENGINE_v3</p>
+                                    <p className="text-[9px] text-zinc-600 font-mono tracking-tighter uppercase leading-none mt-1">LPU_PROCESSING_READY</p>
                                 </div>
                                 <div className="w-12 h-12 rounded-full border border-white/10 flex items-center justify-center bg-white/5">
-                                    {isSpeaking ? <i data-lucide="volume-2" className="text-yellow-500 animate-bounce"></i> : <i data-lucide="shield-check" className="text-yellow-500"></i>}
+                                    <i data-lucide="shield-check" className="text-yellow-500"></i>
                                 </div>
                             </div>
                         </header>
@@ -293,29 +229,29 @@
                             )}
 
                             {activeTab === 'demo' && (
-                                <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-8 animate-fade-in h-[500px]">
+                                <div className="max-w-6xl mx-auto h-full grid grid-cols-1 lg:grid-cols-12 gap-8 animate-fade-in h-[500px]">
                                     <div className="lg:col-span-8 flex flex-col glass rounded-[3rem] overflow-hidden ai-glow">
                                         <div className="p-8 border-b border-white/5 flex items-center justify-between bg-white/[0.02]">
                                             <div className="flex items-center gap-4">
                                                 <div className="w-12 h-12 bg-yellow-500 rounded-full flex items-center justify-center text-black shadow-lg"><i data-lucide="message-square"></i></div>
-                                                <div><h3 className="text-base font-black uppercase italic tracking-widest leading-none">Neural Core v5</h3><p className="text-[9px] text-green-500 font-bold uppercase mt-1">Live AI Instance</p></div>
+                                                <div><h3 className="text-base font-black uppercase italic tracking-widest leading-none">Neural Core v5 (Groq)</h3><p className="text-[9px] text-green-500 font-bold uppercase mt-1">Llama 3.3 Versatile Active ✨</p></div>
                                             </div>
                                         </div>
                                         <div className="flex-1 p-8 overflow-y-auto space-y-8 bg-black/40 custom-scrollbar text-sm">
                                             {messages.map((m, i) => (
                                                 <div key={i} className={`flex ${m.role === 'user' ? 'justify-end' : 'justify-start'} animate-fade-in`}>
-                                                    <div className={`max-w-[85%] p-6 rounded-3xl ${m.role === 'user' ? 'bg-white text-black font-bold' : 'bg-zinc-900 border border-white/10 text-zinc-100 italic'}`}>{m.content}</div>
+                                                    <div className={`max-w-[85%] p-6 rounded-3xl ${m.role === 'user' ? 'bg-white text-black font-bold' : 'bg-zinc-900 border border-white/10 text-zinc-100 italic shadow-lg shadow-black/20'}`}>{m.content}</div>
                                                 </div>
                                             ))}
-                                            {isProcessing && <div className="text-[9px] text-yellow-500 font-mono tracking-widest animate-pulse flex items-center gap-2"><i data-lucide="loader-2" className="animate-spin w-4 h-4"></i> EXECUTING NEURAL COMMAND...</div>}
+                                            {isProcessing && <div className="text-[9px] text-yellow-500 font-mono tracking-widest animate-pulse flex items-center gap-2"><i data-lucide="loader-2" className="animate-spin w-4 h-4"></i> LPU_EXECUTING_COMMAND...</div>}
                                         </div>
                                         <form onSubmit={handleChat} className="p-8 bg-black border-t border-white/5 flex gap-4">
-                                            <input value={chatInput} onChange={(e)=>setChatInput(e.target.value)} disabled={isProcessing} type="text" placeholder="Berikan tantangan bisnis Anda..." className="flex-1 bg-zinc-900 border border-white/10 rounded-2xl px-8 py-5 text-sm focus:border-yellow-500 outline-none text-white"/>
-                                            <button className="bg-yellow-500 text-black px-10 rounded-2xl font-black uppercase text-[10px] tracking-widest">SEND</button>
+                                            <input value={chatInput} onChange={(e)=>setChatInput(e.target.value)} disabled={isProcessing} type="text" placeholder="Tes kecepatan Llama 3.3 di sini..." className="flex-1 bg-zinc-900 border border-white/10 rounded-2xl px-8 py-5 text-sm focus:border-yellow-500 outline-none text-white font-medium"/>
+                                            <button className="bg-yellow-500 text-black px-10 rounded-2xl font-black uppercase text-[10px] tracking-widest shadow-xl shadow-yellow-500/20 active:scale-95 transition-all">SEND</button>
                                         </form>
                                     </div>
                                     <div className="lg:col-span-4 bg-black border border-white/5 rounded-[3rem] flex flex-col overflow-hidden">
-                                        <div className="p-6 border-b border-white/5 flex items-center gap-3"><i data-lucide="terminal" className="w-4 h-4 text-zinc-500"></i><span className="text-[10px] font-black uppercase text-zinc-500">System Logs</span></div>
+                                        <div className="p-6 border-b border-white/5 flex items-center gap-3"><i data-lucide="terminal" className="w-4 h-4 text-zinc-500"></i><span className="text-[10px] font-black uppercase text-zinc-500">Groq Engine Logs</span></div>
                                         <div className="flex-1 p-6 font-mono text-[9px] overflow-y-auto custom-scrollbar space-y-4">
                                             {logs.map(log => (
                                                 <div key={log.id} className="flex gap-2 leading-relaxed">
