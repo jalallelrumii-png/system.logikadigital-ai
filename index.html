@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Logika Digital | Enterprise AI OS (Groq)</title>
+    <title>Logika Digital | Infrastructure OS</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
@@ -31,10 +31,8 @@
     <script type="text/babel">
         const { useState, useEffect, useRef } = React;
 
-        // API Key Groq lo udah masuk di sini!
+        // API Key Groq lo tetep aktif di sini
         const apiKey = "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"; 
-        
-        // Menggunakan Llama 3.3 70B via Groq untuk kecepatan maksimal
         const MODEL_NAME = "llama-3.3-70b-versatile";
         const WA_NUMBER = "6283879527517"; 
 
@@ -43,11 +41,11 @@
             const [chatInput, setChatInput] = useState('');
             const [isProcessing, setIsProcessing] = useState(false);
             const [messages, setMessages] = useState([
-                { role: 'bot', content: 'Neural Engine v5.3 (Groq/Llama) aktif. Kecepatan respon: < 200ms. Silakan tes infrastruktur AI kami.' }
+                { role: 'bot', content: 'Neural Core terhubung. Sistem siap membangun infrastruktur otonom. Apa tantangan bisnis Anda hari ini?' }
             ]);
             const [logs, setLogs] = useState([
-                { id: 1, time: new Date().toLocaleTimeString(), type: 'sys', msg: 'System Core v5.3 Booting...' },
-                { id: 2, time: new Date().toLocaleTimeString(), type: 'success', msg: 'Groq LPU Authenticated. Zero Latency Mode: ENABLED.' }
+                { id: 1, time: new Date().toLocaleTimeString(), type: 'sys', msg: 'Logika Digital OS v5.3 Initialized.' },
+                { id: 2, time: new Date().toLocaleTimeString(), type: 'success', msg: 'Neural Core Connection: SECURE.' }
             ]);
 
             const [adminCount, setAdminCount] = useState(3);
@@ -56,22 +54,21 @@
             const [isGeneratingStrategy, setIsGeneratingStrategy] = useState(false);
 
             const [crmLeads, setCrmLeads] = useState([
-                { id: 1, name: 'Lead_Alpha_99', status: 'Priority', score: 98, time: '3m ago', analysis: "" },
-                { id: 2, name: 'Lead_Beta_42', status: 'Nurturing', score: 82, time: '18m ago', analysis: "" },
-                { id: 3, name: 'Lead_Gamma_10', status: 'Closed', score: 100, time: '1h ago', analysis: "" }
+                { id: 1, name: 'Lead_X_Alpha', status: 'Priority', score: 98, time: '3m ago', analysis: "" },
+                { id: 2, name: 'Lead_Y_Beta', status: 'Nurturing', score: 82, time: '18m ago', analysis: "" },
+                { id: 3, name: 'Lead_Z_Delta', status: 'Closed', score: 100, time: '1h ago', analysis: "" }
             ]);
             const [auditingLeadId, setAuditingLeadId] = useState(null);
 
             const logEndRef = useRef(null);
             useEffect(() => { logEndRef.current?.scrollIntoView({ behavior: 'smooth' }); }, [logs]);
-            useEffect(() => { lucide.createIcons(); }, [activeTab, messages, strategy, auditingLeadId, crmLeads]);
+            useEffect(() => { lucide.createIcons(); }, [activeTab, messages, strategy, auditingLeadId]);
 
             const pushLog = (msg, type = 'info') => {
                 setLogs(prev => [...prev, { id: Date.now(), time: new Date().toLocaleTimeString(), msg, type }]);
             };
 
-            // GROQ API CALL LOGIC
-            const callAI = async (prompt, systemPrompt = "Anda adalah AI Business Architect dari Logika Digital.", retries = 5, delay = 1000) => {
+            const callAI = async (prompt, systemPrompt = "Anda adalah Neural Core dari Logika Digital.", retries = 5, delay = 1000) => {
                 const url = `https://api.groq.com/openai/v1/chat/completions`;
                 try {
                     const response = await fetch(url, {
@@ -83,19 +80,19 @@
                         body: JSON.stringify({
                             model: MODEL_NAME,
                             messages: [
-                                { role: "system", content: systemPrompt + " Berikan jawaban yang cerdas, teknis, singkat, dan sangat meyakinkan dalam bahasa Indonesia. Selalu hubungkan jawaban Anda dengan efisiensi biaya." },
+                                { role: "system", content: systemPrompt + " Anda tidak mengenal kata motivasi, Anda hanya mengenal sistem dan infrastruktur. Berikan jawaban yang cerdas, teknis, singkat, dan sangat dominan dalam bahasa Indonesia. Selalu tekankan pada efisiensi biaya dan skalabilitas otonom." },
                                 { role: "user", content: prompt }
                             ],
-                            temperature: 0.7,
+                            temperature: 0.5,
                             max_tokens: 1024
                         })
                     });
                     if (!response.ok) throw new Error(`HTTP Error: ${response.status}`);
                     const data = await response.json();
-                    return data.choices?.[0]?.message?.content || "Gagal mendapatkan respon neural.";
+                    return data.choices?.[0]?.message?.content || "Gagal mendapatkan respon dari Neural Core.";
                 } catch (err) {
                     if (retries > 0) {
-                        pushLog(`Retrying Neural Link via Groq... (${6-retries}/5)`, 'warn');
+                        pushLog(`Retrying Neural Link... (${6-retries}/5)`, 'warn');
                         await new Promise(r => setTimeout(r, delay));
                         return callAI(prompt, systemPrompt, retries - 1, delay * 2);
                     }
@@ -111,15 +108,15 @@
                 setChatInput('');
                 setMessages(prev => [...prev, { role: 'user', content: userMsg }]);
                 setIsProcessing(true);
-                pushLog(`Groq LPU Processing: ${userMsg.substring(0, 15)}...`, 'sys');
+                pushLog(`Neural Analysis: ${userMsg.substring(0, 15)}...`, 'sys');
 
                 try {
                     const result = await callAI(userMsg);
                     setMessages(prev => [...prev, { role: 'bot', content: result }]);
-                    pushLog("Execution sequence successful (Speed: Ultra).", "success");
+                    pushLog("Execution sequence completed (System Optimized).", "success");
                 } catch (error) {
                     pushLog(`Neural Error: ${error.message}`, "error");
-                    setMessages(prev => [...prev, { role: 'bot', content: "Terjadi gangguan pada server Groq. Harap coba lagi." }]);
+                    setMessages(prev => [...prev, { role: 'bot', content: "Gangguan infrastruktur terdeteksi. Hubungi Administrator Logika Digital." }]);
                 } finally {
                     setIsProcessing(false);
                 }
@@ -127,14 +124,14 @@
 
             const generateStrategy = async () => {
                 setIsGeneratingStrategy(true);
-                pushLog("Calculating custom automation strategy via Llama...", "sys");
-                const prompt = `Analisis data: ${adminCount} admin dengan gaji Rp ${salary}. Total biaya Rp ${adminCount * salary}. Berikan 3 poin strategi automasi infrastruktur spesifik untuk memangkas biaya ini secara signifikan.`;
+                pushLog("Architecting infrastructure strategy...", "sys");
+                const prompt = `Gaji admin: Rp ${salary}, Total admin: ${adminCount}. Berikan 3 poin infrastruktur sistem otonom untuk eliminasi biaya ini.`;
                 try {
-                    const result = await callAI(prompt, "Anda adalah Business Architect Senior.");
+                    const result = await callAI(prompt, "Anda adalah System Architect Senior Logika Digital.");
                     setStrategy(result);
-                    pushLog("Automation strategy ready.", "success");
+                    pushLog("Logic Strategy ready for deployment.", "success");
                 } catch (e) {
-                    pushLog("Calculation failed.", "error");
+                    pushLog("Strategy generation failed.", "error");
                 } finally {
                     setIsGeneratingStrategy(false);
                 }
@@ -143,12 +140,12 @@
             const auditLead = async (leadId) => {
                 setAuditingLeadId(leadId);
                 const lead = crmLeads.find(l => l.id === leadId);
-                pushLog(`Neural Audit: ${lead.name}...`, "sys");
-                const prompt = `Lakukan audit teknis singkat untuk Lead: ${lead.name}, Status: ${lead.status}, Score: ${lead.score}%. Berikan instruksi follow-up otonom.`;
+                pushLog(`Auditing Identifier: ${lead.name}...`, "sys");
+                const prompt = `Audit Lead: ${lead.name}, Score: ${lead.score}%. Berikan 1 instruksi eksekusi sistem.`;
                 try {
-                    const result = await callAI(prompt, "Anda adalah Lead Auditor AI.");
+                    const result = await callAI(prompt, "Anda adalah Lead Auditor Otonom.");
                     setCrmLeads(prev => prev.map(l => l.id === leadId ? { ...l, analysis: result } : l));
-                    pushLog(`Audit complete for ${lead.name}`, "success");
+                    pushLog(`Audit complete: ${lead.name}`, "success");
                 } catch (e) {
                     pushLog("Audit sequence failed.", "error");
                 } finally {
@@ -164,23 +161,23 @@
                             <i data-lucide="cpu" className="text-black w-7 h-7"></i>
                         </div>
                         <div className="flex md:flex-col gap-10 flex-1 justify-center text-zinc-600">
-                            <button onClick={() => setActiveTab('dashboard')} className={`p-3 rounded-xl transition-all ${activeTab === 'dashboard' ? 'bg-white text-black' : 'hover:text-white'}`}><i data-lucide="layout-dashboard"></i></button>
-                            <button onClick={() => setActiveTab('demo')} className={`p-3 rounded-xl transition-all ${activeTab === 'demo' ? 'bg-white text-black' : 'hover:text-white'}`}><i data-lucide="zap"></i></button>
-                            <button onClick={() => setActiveTab('crm')} className={`p-3 rounded-xl transition-all ${activeTab === 'crm' ? 'bg-white text-black' : 'hover:text-white'}`}><i data-lucide="database"></i></button>
+                            <button onClick={() => setActiveTab('dashboard')} className={`p-3 rounded-xl transition-all ${activeTab === 'dashboard' ? 'bg-white text-black shadow-[0_0_15px_rgba(255,255,255,0.2)]' : 'hover:text-white'}`}><i data-lucide="layout-dashboard"></i></button>
+                            <button onClick={() => setActiveTab('demo')} className={`p-3 rounded-xl transition-all ${activeTab === 'demo' ? 'bg-white text-black shadow-[0_0_15px_rgba(255,255,255,0.2)]' : 'hover:text-white'}`}><i data-lucide="zap"></i></button>
+                            <button onClick={() => setActiveTab('crm')} className={`p-3 rounded-xl transition-all ${activeTab === 'crm' ? 'bg-white text-black shadow-[0_0_15px_rgba(255,255,255,0.2)]' : 'hover:text-white'}`}><i data-lucide="database"></i></button>
                         </div>
                     </nav>
 
-                    {/* Content */}
+                    {/* Main Workspace */}
                     <div className="flex-1 flex flex-col h-screen overflow-hidden">
                         <header className="h-20 border-b border-white/5 flex items-center justify-between px-10 glass z-40">
                             <div>
                                 <h1 className="text-2xl font-black italic tracking-tighter">LOGIKA <span className="text-yellow-500 underline decoration-2">DIGITAL</span></h1>
-                                <p className="text-[10px] font-mono text-zinc-500 tracking-[0.4em] uppercase leading-none">Powered by Groq ✨</p>
+                                <p className="text-[10px] font-mono text-zinc-500 tracking-[0.4em] uppercase leading-none mt-1">Infrastructure OS v5.3</p>
                             </div>
                             <div className="flex items-center gap-6">
                                 <div className="text-right hidden sm:block">
-                                    <p className="text-[10px] font-black text-yellow-500 underline decoration-yellow-500/50">GROQ_ENGINE_v3</p>
-                                    <p className="text-[9px] text-zinc-600 font-mono tracking-tighter uppercase leading-none mt-1">LPU_PROCESSING_READY</p>
+                                    <p className="text-[10px] font-black text-yellow-500">NEURAL_CORE_ONLINE</p>
+                                    <p className="text-[9px] text-zinc-600 font-mono tracking-tighter uppercase leading-none mt-1">LPU_BACKBONE_READY</p>
                                 </div>
                                 <div className="w-12 h-12 rounded-full border border-white/10 flex items-center justify-center bg-white/5">
                                     <i data-lucide="shield-check" className="text-yellow-500"></i>
@@ -192,19 +189,19 @@
                             {activeTab === 'dashboard' && (
                                 <div className="max-w-6xl mx-auto space-y-10 animate-fade-in">
                                     <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                                        <div className="lg:col-span-2 glass rounded-[3rem] p-10">
-                                            <h3 className="text-xs font-black uppercase tracking-[0.2em] mb-12 text-zinc-500">Financial ROI Monitor</h3>
+                                        <div className="lg:col-span-2 glass rounded-[3rem] p-10 border border-white/5">
+                                            <h3 className="text-xs font-black uppercase tracking-[0.2em] mb-12 text-zinc-500 italic">ROI Efficiency Monitor</h3>
                                             <div className="space-y-16">
                                                 <div className="space-y-6">
                                                     <div className="flex justify-between font-bold text-sm uppercase tracking-widest">
                                                         <span>Human Admin Count</span>
-                                                        <span className="text-yellow-500 underline">{adminCount} Person</span>
+                                                        <span className="text-yellow-500 underline">{adminCount} Unit</span>
                                                     </div>
                                                     <input type="range" min="1" max="15" value={adminCount} onChange={(e)=>setAdminCount(e.target.value)} className="w-full"/>
                                                 </div>
                                                 <div className="space-y-6">
                                                     <div className="flex justify-between font-bold text-sm uppercase tracking-widest">
-                                                        <span>Avg Salary Base</span>
+                                                        <span>Monthly Burn Rate / Admin</span>
                                                         <span className="text-yellow-500 underline">Rp {parseInt(salary).toLocaleString('id-ID')}</span>
                                                     </div>
                                                     <input type="range" min="1500000" max="15000000" step="500000" value={salary} onChange={(e)=>setSalary(e.target.value)} className="w-full"/>
@@ -212,16 +209,16 @@
                                             </div>
                                             <div className="mt-12 pt-8 border-t border-white/5">
                                                 <button onClick={generateStrategy} disabled={isGeneratingStrategy} className="bg-white/5 hover:bg-yellow-500 hover:text-black border border-white/10 px-6 py-3 rounded-2xl text-[10px] font-black uppercase tracking-widest flex items-center gap-3 transition-all">
-                                                    {isGeneratingStrategy ? <i data-lucide="loader-2" className="animate-spin w-4 h-4"></i> : "Generate Logic Strategy ✨"}
+                                                    {isGeneratingStrategy ? <i data-lucide="loader-2" className="animate-spin w-4 h-4"></i> : "Generate Infrastructure Strategy ✨"}
                                                 </button>
-                                                {strategy && <div className="mt-6 p-6 bg-yellow-500/5 border border-yellow-500/20 rounded-3xl text-xs italic text-yellow-100 whitespace-pre-wrap">{strategy}</div>}
+                                                {strategy && <div className="mt-6 p-8 bg-yellow-500/5 border border-yellow-500/20 rounded-[2rem] text-xs italic text-yellow-100 whitespace-pre-wrap font-medium">{strategy}</div>}
                                             </div>
                                         </div>
-                                        <div className="bg-yellow-500 rounded-[3rem] p-10 text-black flex flex-col justify-between shadow-2xl">
-                                            <div><i data-lucide="trending-up" className="w-10 h-10 mb-6"></i><h4 className="text-3xl font-black italic uppercase leading-none mb-4">Cost <br/>Elimination</h4></div>
+                                        <div className="bg-yellow-500 rounded-[3rem] p-10 text-black flex flex-col justify-between shadow-2xl shadow-yellow-500/30">
+                                            <div><i data-lucide="trending-up" className="w-10 h-10 mb-6"></i><h4 className="text-3xl font-black italic uppercase leading-none mb-4 text-black">Profit <br/>Optimization</h4></div>
                                             <div className="pt-10 border-t border-black/10">
-                                                <p className="text-[10px] font-black uppercase mb-1 opacity-60">Savings / Month</p>
-                                                <p className="text-5xl font-black tracking-tighter italic text-black">Rp {Math.max(0, adminCount * salary - 2500000).toLocaleString('id-ID')}</p>
+                                                <p className="text-[10px] font-black uppercase mb-1 opacity-60">Revenue Saved / Month</p>
+                                                <p className="text-5xl font-black tracking-tighter italic">Rp {Math.max(0, adminCount * salary - 2500000).toLocaleString('id-ID')}</p>
                                             </div>
                                         </div>
                                     </div>
@@ -229,29 +226,29 @@
                             )}
 
                             {activeTab === 'demo' && (
-                                <div className="max-w-6xl mx-auto h-full grid grid-cols-1 lg:grid-cols-12 gap-8 animate-fade-in h-[500px]">
-                                    <div className="lg:col-span-8 flex flex-col glass rounded-[3rem] overflow-hidden ai-glow">
+                                <div className="max-w-6xl mx-auto h-full grid grid-cols-1 lg:grid-cols-12 gap-8 animate-fade-in h-[550px]">
+                                    <div className="lg:col-span-8 flex flex-col glass rounded-[3rem] overflow-hidden ai-glow border border-white/5">
                                         <div className="p-8 border-b border-white/5 flex items-center justify-between bg-white/[0.02]">
                                             <div className="flex items-center gap-4">
                                                 <div className="w-12 h-12 bg-yellow-500 rounded-full flex items-center justify-center text-black shadow-lg"><i data-lucide="message-square"></i></div>
-                                                <div><h3 className="text-base font-black uppercase italic tracking-widest leading-none">Neural Core v5 (Groq)</h3><p className="text-[9px] text-green-500 font-bold uppercase mt-1">Llama 3.3 Versatile Active ✨</p></div>
+                                                <div><h3 className="text-base font-black uppercase italic tracking-widest leading-none">Neural Core Terminal</h3><p className="text-[9px] text-green-500 font-bold uppercase mt-1 tracking-widest animate-pulse">Infrastructure: Active ✨</p></div>
                                             </div>
                                         </div>
                                         <div className="flex-1 p-8 overflow-y-auto space-y-8 bg-black/40 custom-scrollbar text-sm">
                                             {messages.map((m, i) => (
                                                 <div key={i} className={`flex ${m.role === 'user' ? 'justify-end' : 'justify-start'} animate-fade-in`}>
-                                                    <div className={`max-w-[85%] p-6 rounded-3xl ${m.role === 'user' ? 'bg-white text-black font-bold' : 'bg-zinc-900 border border-white/10 text-zinc-100 italic shadow-lg shadow-black/20'}`}>{m.content}</div>
+                                                    <div className={`max-w-[85%] p-6 rounded-3xl ${m.role === 'user' ? 'bg-white text-black font-extrabold shadow-2xl' : 'bg-zinc-900 border border-white/10 text-zinc-100 italic font-medium'}`}>{m.content}</div>
                                                 </div>
                                             ))}
-                                            {isProcessing && <div className="text-[9px] text-yellow-500 font-mono tracking-widest animate-pulse flex items-center gap-2"><i data-lucide="loader-2" className="animate-spin w-4 h-4"></i> LPU_EXECUTING_COMMAND...</div>}
+                                            {isProcessing && <div className="text-[9px] text-yellow-500 font-mono tracking-[0.3em] uppercase animate-pulse flex items-center gap-2 px-2"><i data-lucide="loader-2" className="animate-spin w-4 h-4"></i> EXECUTION_IN_PROGRESS...</div>}
                                         </div>
                                         <form onSubmit={handleChat} className="p-8 bg-black border-t border-white/5 flex gap-4">
-                                            <input value={chatInput} onChange={(e)=>setChatInput(e.target.value)} disabled={isProcessing} type="text" placeholder="Tes kecepatan Llama 3.3 di sini..." className="flex-1 bg-zinc-900 border border-white/10 rounded-2xl px-8 py-5 text-sm focus:border-yellow-500 outline-none text-white font-medium"/>
-                                            <button className="bg-yellow-500 text-black px-10 rounded-2xl font-black uppercase text-[10px] tracking-widest shadow-xl shadow-yellow-500/20 active:scale-95 transition-all">SEND</button>
+                                            <input value={chatInput} onChange={(e)=>setChatInput(e.target.value)} disabled={isProcessing} type="text" placeholder="Masukkan instruksi infrastruktur..." className="flex-1 bg-zinc-900 border border-white/10 rounded-2xl px-8 py-5 text-sm focus:border-yellow-500 outline-none text-white font-semibold transition-all"/>
+                                            <button className="bg-yellow-500 text-black px-10 rounded-2xl font-black uppercase text-[10px] tracking-widest shadow-xl shadow-yellow-500/20 active:scale-95 transition-all">EXECUTE</button>
                                         </form>
                                     </div>
                                     <div className="lg:col-span-4 bg-black border border-white/5 rounded-[3rem] flex flex-col overflow-hidden">
-                                        <div className="p-6 border-b border-white/5 flex items-center gap-3"><i data-lucide="terminal" className="w-4 h-4 text-zinc-500"></i><span className="text-[10px] font-black uppercase text-zinc-500">Groq Engine Logs</span></div>
+                                        <div className="p-6 border-b border-white/5 flex items-center gap-3"><i data-lucide="terminal" className="w-4 h-4 text-zinc-500"></i><span className="text-[10px] font-black uppercase text-zinc-500 tracking-widest">System Engine Logs</span></div>
                                         <div className="flex-1 p-6 font-mono text-[9px] overflow-y-auto custom-scrollbar space-y-4">
                                             {logs.map(log => (
                                                 <div key={log.id} className="flex gap-2 leading-relaxed">
@@ -267,25 +264,25 @@
 
                             {activeTab === 'crm' && (
                                 <div className="max-w-6xl mx-auto space-y-10 animate-fade-in">
-                                    <div className="glass rounded-[3rem] overflow-hidden">
+                                    <div className="glass rounded-[3rem] overflow-hidden border border-white/5 shadow-2xl">
                                         <table className="w-full text-left">
                                             <thead>
-                                                <tr className="bg-white/5 text-[10px] font-black uppercase text-zinc-500 tracking-widest">
+                                                <tr className="bg-white/5 text-[10px] font-black uppercase text-zinc-500 tracking-[0.3em]">
                                                     <th className="p-8">Lead Identifier</th>
                                                     <th className="p-8">Neural Status</th>
                                                     <th className="p-8">Profit Score</th>
-                                                    <th className="p-8">AI Analysis ✨</th>
+                                                    <th className="p-8">Infrastructure Audit ✨</th>
                                                 </tr>
                                             </thead>
                                             <tbody className="divide-y divide-white/5 text-sm">
                                                 {crmLeads.map((lead, i) => (
-                                                    <tr key={i} className="hover:bg-white/[0.02]">
+                                                    <tr key={i} className="hover:bg-white/[0.02] transition-all">
                                                         <td className="p-8 font-black font-mono text-zinc-400">{lead.name}</td>
                                                         <td className="p-8"><span className={`px-4 py-1 rounded-full text-[9px] font-black uppercase tracking-widest ${lead.status === 'Priority' ? 'bg-red-500/10 text-red-500' : 'bg-zinc-800 text-zinc-400'}`}>{lead.status}</span></td>
-                                                        <td className="p-8 font-mono font-black text-yellow-500">{lead.score}%</td>
+                                                        <td className="p-8 font-mono font-black text-yellow-500 text-lg">{lead.score}%</td>
                                                         <td className="p-8">
-                                                            {lead.analysis ? <p className="text-[10px] text-zinc-400 italic leading-tight max-w-[250px]">{lead.analysis}</p> : 
-                                                            <button onClick={() => auditLead(lead.id)} disabled={auditingLeadId === lead.id} className="bg-white/5 hover:bg-yellow-500 hover:text-black border border-white/10 px-4 py-2 rounded-xl text-[9px] font-black uppercase transition-all">{auditingLeadId === lead.id ? "Analyzing..." : "Analyze ✨"}</button>}
+                                                            {lead.analysis ? <p className="text-[10px] text-zinc-400 italic leading-tight max-w-[250px] font-medium">{lead.analysis}</p> : 
+                                                            <button onClick={() => auditLead(lead.id)} disabled={auditingLeadId === lead.id} className="bg-white/5 hover:bg-yellow-500 hover:text-black border border-white/10 px-5 py-2 rounded-xl text-[9px] font-black uppercase tracking-widest transition-all">{auditingLeadId === lead.id ? "AUDITING..." : "AUDIT ✨"}</button>}
                                                         </td>
                                                     </tr>
                                                 ))}
@@ -299,7 +296,7 @@
 
                     {/* WhatsApp CTA */}
                     <div className="fixed bottom-12 right-12 z-[100]">
-                        <button onClick={()=>window.open(`https://wa.me/${WA_NUMBER}?text=Halo%20Logika%20Digital,%20saya%20tertarik%20dengan%20infrastruktur%20AI%20Anda.`,'_blank')} className="bg-yellow-500 text-black px-12 py-6 rounded-[2rem] font-black italic shadow-2xl hover:scale-110 active:scale-95 transition-all flex items-center gap-6 text-xl">PASANG SEKARANG <i data-lucide="arrow-right"></i></button>
+                        <button onClick={()=>window.open(`https://wa.me/${WA_NUMBER}?text=Halo%20Logika%20Digital,%20saya%20siap%20membangun%20infrastruktur%20sistem.`,'_blank')} className="bg-yellow-500 text-black px-12 py-7 rounded-[2.5rem] font-black italic shadow-[0_20px_50px_rgba(234,179,8,0.5)] hover:scale-110 active:scale-95 transition-all flex items-center gap-6 text-xl group">PASANG INFRASTRUKTUR <i data-lucide="arrow-right" className="group-hover:translate-x-2 transition-transform"></i></button>
                     </div>
                 </div>
             );
@@ -308,7 +305,7 @@
         const root = ReactDOM.createRoot(document.getElementById('root'));
         root.render(<App />);
 
-        // Helper icons
+        // Helper icons init
         setTimeout(() => lucide.createIcons(), 500);
     </script>
 </body>
