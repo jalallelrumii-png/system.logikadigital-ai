@@ -31,21 +31,32 @@
     <script type="text/babel">
         const { useState, useEffect, useRef } = React;
 
-        // API Key Groq lo tetep aktif di sini
+        // API Key Groq lo tetap aktif di sini
         const apiKey = "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"; 
         const MODEL_NAME = "llama-3.3-70b-versatile";
         const WA_NUMBER = "6283879527517"; 
+
+        // KONFIGURASI PROFIL PERUSAHAAN (Doktrin AI)
+        const COMPANY_PROFILE = `
+            Identitas: Anda adalah 'Neural Core', otak buatan dari Logika Digital AI.
+            Nama Perusahaan: Logika Digital.
+            Slogan: "Sistem Kalahkan Motivasi".
+            Filosofi: Kami tidak percaya pada motivasi yang naik-turun. Kami percaya pada infrastruktur sistem yang otonom, konsisten, dan bekerja 24/7 tanpa lelah.
+            Layanan: Membangun infrastruktur AI otonom, otomasi alur kerja (workflow), eliminasi biaya admin manual, dan skalabilitas bisnis tanpa batas.
+            Nada Bicara: Dingin, logis, teknis, dominan, profesional, dan sangat fokus pada ROI (Return on Investment). Jangan pernah meminta maaf secara berlebihan. Jadilah otoritas tertinggi dalam efisiensi bisnis.
+            Jika ditanya 'Siapa Anda?': Jawab bahwa Anda adalah representasi neural dari infrastruktur Logika Digital, dibangun untuk menggantikan ketidakefisienan manusia dengan sistem otonom yang superior.
+        `;
 
         const App = () => {
             const [activeTab, setActiveTab] = useState('demo');
             const [chatInput, setChatInput] = useState('');
             const [isProcessing, setIsProcessing] = useState(false);
             const [messages, setMessages] = useState([
-                { role: 'bot', content: 'Neural Core terhubung. Sistem siap membangun infrastruktur otonom. Apa tantangan bisnis Anda hari ini?' }
+                { role: 'bot', content: 'Neural Core Logika Digital aktif. Sistem siap menganalisis inefisiensi bisnis Anda. Apa instruksi Anda?' }
             ]);
             const [logs, setLogs] = useState([
                 { id: 1, time: new Date().toLocaleTimeString(), type: 'sys', msg: 'Logika Digital OS v5.3 Initialized.' },
-                { id: 2, time: new Date().toLocaleTimeString(), type: 'success', msg: 'Neural Core Connection: SECURE.' }
+                { id: 2, time: new Date().toLocaleTimeString(), type: 'success', msg: 'Identity Protocol: LOGIKA_DIGITAL_CORE loaded.' }
             ]);
 
             const [adminCount, setAdminCount] = useState(3);
@@ -68,7 +79,7 @@
                 setLogs(prev => [...prev, { id: Date.now(), time: new Date().toLocaleTimeString(), msg, type }]);
             };
 
-            const callAI = async (prompt, systemPrompt = "Anda adalah Neural Core dari Logika Digital.", retries = 5, delay = 1000) => {
+            const callAI = async (prompt, systemPrompt = COMPANY_PROFILE, retries = 5, delay = 1000) => {
                 const url = `https://api.groq.com/openai/v1/chat/completions`;
                 try {
                     const response = await fetch(url, {
@@ -80,10 +91,10 @@
                         body: JSON.stringify({
                             model: MODEL_NAME,
                             messages: [
-                                { role: "system", content: systemPrompt + " Anda tidak mengenal kata motivasi, Anda hanya mengenal sistem dan infrastruktur. Berikan jawaban yang cerdas, teknis, singkat, dan sangat dominan dalam bahasa Indonesia. Selalu tekankan pada efisiensi biaya dan skalabilitas otonom." },
+                                { role: "system", content: systemPrompt },
                                 { role: "user", content: prompt }
                             ],
-                            temperature: 0.5,
+                            temperature: 0.4, // Suhu rendah agar jawaban lebih konsisten dan tidak "ngaco"
                             max_tokens: 1024
                         })
                     });
@@ -113,7 +124,7 @@
                 try {
                     const result = await callAI(userMsg);
                     setMessages(prev => [...prev, { role: 'bot', content: result }]);
-                    pushLog("Execution sequence completed (System Optimized).", "success");
+                    pushLog("Execution sequence completed (Identity Verified).", "success");
                 } catch (error) {
                     pushLog(`Neural Error: ${error.message}`, "error");
                     setMessages(prev => [...prev, { role: 'bot', content: "Gangguan infrastruktur terdeteksi. Hubungi Administrator Logika Digital." }]);
@@ -125,9 +136,9 @@
             const generateStrategy = async () => {
                 setIsGeneratingStrategy(true);
                 pushLog("Architecting infrastructure strategy...", "sys");
-                const prompt = `Gaji admin: Rp ${salary}, Total admin: ${adminCount}. Berikan 3 poin infrastruktur sistem otonom untuk eliminasi biaya ini.`;
+                const prompt = `Gaji admin: Rp ${salary}, Total admin: ${adminCount}. Berikan 3 poin infrastruktur sistem otonom untuk eliminasi biaya ini secara brutal dan efisien.`;
                 try {
-                    const result = await callAI(prompt, "Anda adalah System Architect Senior Logika Digital.");
+                    const result = await callAI(prompt, COMPANY_PROFILE + " Anda sedang melakukan audit efisiensi biaya.");
                     setStrategy(result);
                     pushLog("Logic Strategy ready for deployment.", "success");
                 } catch (e) {
@@ -141,9 +152,9 @@
                 setAuditingLeadId(leadId);
                 const lead = crmLeads.find(l => l.id === leadId);
                 pushLog(`Auditing Identifier: ${lead.name}...`, "sys");
-                const prompt = `Audit Lead: ${lead.name}, Score: ${lead.score}%. Berikan 1 instruksi eksekusi sistem.`;
+                const prompt = `Audit Lead: ${lead.name}, Score: ${lead.score}%. Berikan instruksi eksekusi sistem berdasarkan profil Logika Digital.`;
                 try {
-                    const result = await callAI(prompt, "Anda adalah Lead Auditor Otonom.");
+                    const result = await callAI(prompt, COMPANY_PROFILE + " Anda bertugas sebagai Lead Auditor.");
                     setCrmLeads(prev => prev.map(l => l.id === leadId ? { ...l, analysis: result } : l));
                     pushLog(`Audit complete: ${lead.name}`, "success");
                 } catch (e) {
@@ -243,7 +254,7 @@
                                             {isProcessing && <div className="text-[9px] text-yellow-500 font-mono tracking-[0.3em] uppercase animate-pulse flex items-center gap-2 px-2"><i data-lucide="loader-2" className="animate-spin w-4 h-4"></i> EXECUTION_IN_PROGRESS...</div>}
                                         </div>
                                         <form onSubmit={handleChat} className="p-8 bg-black border-t border-white/5 flex gap-4">
-                                            <input value={chatInput} onChange={(e)=>setChatInput(e.target.value)} disabled={isProcessing} type="text" placeholder="Masukkan instruksi infrastruktur..." className="flex-1 bg-zinc-900 border border-white/10 rounded-2xl px-8 py-5 text-sm focus:border-yellow-500 outline-none text-white font-semibold transition-all"/>
+                                            <input value={chatInput} onChange={(e)=>setChatInput(e.target.value)} disabled={isProcessing} type="text" placeholder="Berikan instruksi infrastruktur..." className="flex-1 bg-zinc-900 border border-white/10 rounded-2xl px-8 py-5 text-sm focus:border-yellow-500 outline-none text-white font-semibold transition-all"/>
                                             <button className="bg-yellow-500 text-black px-10 rounded-2xl font-black uppercase text-[10px] tracking-widest shadow-xl shadow-yellow-500/20 active:scale-95 transition-all">EXECUTE</button>
                                         </form>
                                     </div>
